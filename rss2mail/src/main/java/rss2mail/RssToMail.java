@@ -2,20 +2,15 @@ package rss2mail;
 
 import java.lang.reflect.Constructor;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.List;
 import java.util.logging.Logger;
 
 import com.google.gson.JsonObject;
 
-import rss2mail.cloudant.BaseProperties;
-import rss2mail.interfaces.Database;
-import rss2mail.interfaces.Properties;
 import rss2mail.interfaces.RssItem;
-import rss2mail.interfaces.RssStatus;
 import rss2mail.interfaces.SaxHandler;
-import rss2mail.interfaces.SaxHandlerProperties;
 import rss2mail.interfaces.Sender;
-import rss2mail.interfaces.SenderProperties;
 
 public class RssToMail {
 	
@@ -28,9 +23,9 @@ public class RssToMail {
 		jsonLogs.add(sequenceNumber, jsonObject);
 	}
 		
-	private final static String ARG_SAXHANDLER_CLASS = "rss2mail.saxhandler.class";
-	private final static String ARG_SENDER_CLASS = "rss2mail.sender.class";
-	private final static String ARG_PROPERTIES = "rss2mail.properties";
+	public final static String ARG_SAXHANDLER_CLASS = "rss2mail.saxhandler.class";
+	public final static String ARG_SENDER_CLASS = "rss2mail.sender.class";
+	public final static String ARG_PROPERTIES = "rss2mail.properties";
 	
 	public static String PROPERTIES_ID = System.getProperty(ARG_PROPERTIES);
 	private static String SAXHANDLER_CLASS = System.getProperty(ARG_SAXHANDLER_CLASS,rss2mail.BaseSaxHandler.class.getCanonicalName());
@@ -50,6 +45,16 @@ public class RssToMail {
 
 	public static void run() {
 		
+		ClassLoader cl = ClassLoader.getSystemClassLoader();
+        URL[] urls = ((URLClassLoader)cl).getURLs();
+
+        for(URL url: urls){
+        	logger.info("IN CLASSPATH ... "+url.getFile());
+        }
+        
+		logger.info(ARG_PROPERTIES+" = "+PROPERTIES_ID);
+		logger.info(ARG_SAXHANDLER_CLASS+" = "+SAXHANDLER_CLASS);
+		logger.info(ARG_SENDER_CLASS+" = "+SENDER_CLASS);
 		try {
 			
 			SAXHANDLER = getSaxHandler();

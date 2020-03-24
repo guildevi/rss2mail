@@ -20,7 +20,7 @@ public class TestMailProperties {
 		try {
 			CloudantDatabase database = new CloudantDatabase();
 			BaseMailProperties senderProperties = (BaseMailProperties)database.find(BaseMailProperties.class);
-			Properties properties = senderProperties.toPropeties();
+			Properties properties = senderProperties.toProperties();
 			assertNotNull("Sender properties does not exist", senderProperties);
 			logger.info(senderProperties.toString());
 			assertNotNull("Sender properties host is not set", senderProperties.getHost());

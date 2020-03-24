@@ -53,6 +53,7 @@ public class BaseMailSender implements Sender
 	private UserGroups userGroups;
 	
 	public BaseMailSender() throws Exception {
+		
 		super();
 		initDatabase();
 		initProperties();
@@ -81,7 +82,7 @@ public class BaseMailSender implements Sender
 		Session session = null;
 		
 		try {
-			session = Session.getInstance(getMailProperties().toPropeties());
+			session = Session.getInstance(getMailProperties().toProperties());
 		} catch(Exception e) {
 			logger.severe(e.toString());
 			throw e;

@@ -84,7 +84,7 @@ public class BaseMailProperties extends CloudantObject implements rss2mail.inter
 		this.replyTo = replyTo;
 	}
 
-	public Properties toPropeties() {
+	public Properties toProperties() {
 		Properties properties = new Properties();
 		properties.setProperty(PROP_HOST, getHost());
 		properties.setProperty(PROP_PORT, Integer.toString(getPort()));

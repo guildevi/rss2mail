@@ -12,7 +12,7 @@ public interface MailProperties {
 		public String getUser();
 		public String getPassword();
 		public String getReplyTo();
-		public Properties toPropeties();
+		public Properties toProperties();
 		public JsonObject toJson();
 		public String toString();
 }
