@@ -1,12 +1,8 @@
 package rss2mail.ibmcloud.pup;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.net.URL;
-import java.net.URLClassLoader;
+import org.junit.Test;
 
 import org.junit.BeforeClass;
-import org.junit.jupiter.api.Test;
 
 import rss2mail.RssToMail;
 
