@@ -1,0 +1,4 @@
+[submodule "cloudant.utilities"]
+	path = cloudant.utilities
+	url = https://github.com/guildevi/cloudant.utilities.git
+	branch = submodule
