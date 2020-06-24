@@ -33,6 +33,7 @@ dependencies {
 }
 
 test {
-    systemProperty "java.util.logging.config.file", "./build/resources/test/logging.properties"
+    systemProperty "cloudant.properties", "../rss2mail.properties/cloudant.properties"
+    systemProperty "java.util.logging.config.file", "../rss2mail.properties/logging.properties"
     testLogging.showStandardStreams = true
 }
