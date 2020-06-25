@@ -1,0 +1,5 @@
+sourceControl {
+    gitRepository("https://github.com/guildevi/cloudant.utilities.git") {
+        producesModule("cloudant:utilities")
+    }
+}
