@@ -31,11 +31,7 @@ dependencies {
     implementation 'jakarta.mail:jakarta.mail-api:1.6.4'
     implementation 'com.sun.mail:javax.mail:1.6.0'
     
-    implementation('cloudant:utilities') {
-        version {
-            branch = 'gradle'
-        }
-    }
+    implementation 'cloudant:utilities:1.0'
 }
 
 test {
