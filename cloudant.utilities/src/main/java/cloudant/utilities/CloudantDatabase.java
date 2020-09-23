@@ -1,21 +1,15 @@
 package cloudant.utilities;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Enumeration;
-import java.util.Properties;
 import java.util.logging.Logger;
 
 //
 import com.cloudant.client.api.ClientBuilder;
 import com.cloudant.client.api.CloudantClient;
 import com.cloudant.client.api.Database;
-import com.cloudant.client.api.model.DbInfo;
 import com.google.gson.JsonObject;
 
 import cloudant.utilities.exceptions.CloudantException;
+import system.utilities.PropertyManager;
 
 //import cloudant.utilities.exceptions.CloudantException;
 
@@ -24,13 +18,13 @@ public class CloudantDatabase {
 	public static Logger logger = 
 			java.util.logging.Logger.getLogger(CloudantDatabase.class.getCanonicalName());
 
-	public static String PROP_CLOUDANT_PROPERTIES="cloudant.properties";
-	public static String PROP_CLOUDANT_ACCOUNT="cloudant.account";
-	public static String PROP_CLOUDANT_USERNAME="cloudant.username";
-	public static String PROP_CLOUDANT_PASFSWORD="cloudant.password";
-	public static String PROP_CLOUDANT_DATABASE="cloudant.database";
+	public static String CLOUDANT_PROPERTIES="cloudant.properties";
+	public static String CLOUDANT_ACCOUNT="cloudant.account";
+	public static String CLOUDANT_USERNAME="cloudant.username";
+	public static String CLOUDANT_PASSWORD="cloudant.password";
+	public static String CLOUDANT_DATABASE="cloudant.database";
 	
-	private String properties=System.getProperty(PROP_CLOUDANT_PROPERTIES, PROP_CLOUDANT_PROPERTIES);
+	//private String properties=System.getProperty(CLOUDANT_PROPERTIES, CLOUDANT_PROPERTIES);
 	private String account;
 	private String username;
 	private String password;
@@ -59,71 +53,15 @@ public class CloudantDatabase {
 	}
 	
 	protected void init() {
-		initFromResource();
-		initFromFile();
-		setAccount(System.getProperty(PROP_CLOUDANT_ACCOUNT, getAccount()));
-		setUsername(System.getProperty(PROP_CLOUDANT_USERNAME, getAccount()));
-		setPassword(System.getProperty(PROP_CLOUDANT_ACCOUNT, getPassword()));
-		setName(System.getProperty(PROP_CLOUDANT_DATABASE, getName()));
+		
+		setAccount(PropertyManager.getProperty(CLOUDANT_PROPERTIES, CLOUDANT_ACCOUNT));
+		setUsername(PropertyManager.getProperty(CLOUDANT_PROPERTIES, CLOUDANT_USERNAME));
+		setPassword(PropertyManager.getProperty(CLOUDANT_PROPERTIES, CLOUDANT_PASSWORD));
+		setName(PropertyManager.getProperty(CLOUDANT_PROPERTIES, CLOUDANT_DATABASE));
 		logger.info(toString());
 		getDatabase();
 	}
-	
-	protected void initFromResource() {
-		InputStream stream = null;
-		URL resourceURL = CloudantDatabase.class.getResource("/"+properties);
-
-		if(resourceURL==null) {
-			logger.warning("No resource  /"+properties);
-			return;
-		}
 		
-		try {
-			stream = resourceURL.openStream();
-			init(stream);
-		} catch(Exception e) {
-			logger.warning(e.toString());
-		} finally {
-			try {stream.close();} catch(Exception e) {}
-		}
-	}
-	
-	protected void initFromFile() {
-		InputStream stream = null;
-		File file = new File(properties);
-		if(! file.exists()) {
-			logger.fine("File "+properties+" does not exist");
-			return;
-		}
-		if(! file.canRead()) {
-			logger.severe("File "+properties+" is not readable");
-			return;
-		}
-		try {
-			stream = new FileInputStream(file);
-			init(stream);
-		} catch(Exception e) {
-			logger.severe(e.toString());
-		} finally {
-			try {stream.close();} catch(Exception e) {}
-		}
-	}
-	
-	protected void init(InputStream stream) {
-		Properties properties = new Properties();
-		try {
-			properties.load(stream);
-			account = properties.getProperty("CLOUDANT_ACCOUNT",account);
-			username = properties.getProperty("CLOUDANT_USERNAME",account);
-			password = properties.getProperty("CLOUDANT_PASSWORD",password);
-			name = properties.getProperty("CLOUDANT_DATABASE",name);
-		} catch(Exception e) {
-			logger.warning(e.toString());
-		} finally {
-			try {stream.close();} catch(Exception e) {}
-		}
-	}
-	
 	protected void initDatabase() throws CloudantException {
 		try {
 			CloudantClient cloudClient = ClientBuilder.account(account)

@@ -1,0 +1,2 @@
+include ':system.utilities'
+project(':system.utilities').projectDir = new File(settingsDir, '../system.utilities')

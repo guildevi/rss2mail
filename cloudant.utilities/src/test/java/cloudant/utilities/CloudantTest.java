@@ -49,13 +49,15 @@ public class CloudantTest {
 		
 		try {
 			database = new CloudantDatabase();
+			logger.info("Connected Cloudant database "+database.getName());
 		} catch(Exception e) {
-			logger.severe("Failed connect to Cloudant databse: "+e.toString());
+			logger.severe("Failed connect to Cloudant database: "+e.toString());
 		}
 		assertNotNull("Database is null!", database);
 		
 		try {
 			cloudantProperties = CloudantProperties.find(database,_id);
+			logger.info("Found object "+cloudantProperties.toString());
 		} catch(Exception e) {
 			logger.info("Object "+_id+" does not exists");
 		}

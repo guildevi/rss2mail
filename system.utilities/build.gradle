@@ -23,19 +23,15 @@ dependencies {
     api 'org.apache.commons:commons-math3:3.6.1'
 
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
-    // implementation 'com.google.guava:guava:28.0-jre'
+    implementation 'com.google.guava:guava:28.0-jre'
 
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
-    
-    implementation 'com.cloudant:cloudant-client:2.18.0'
-    implementation 'com.cloudant:cloudant-http:2.18.0'
-    
-    compile project(':system.utilities')
 }
 
 test {
-    //systemProperty "cloudant.properties", "/Users/gude/eclipse-workspace/RssToMail/rss2mail.properties/cloudant.properties"
-    //systemProperty "java.util.logging.config.file", "../rss2mail.properties/logging.properties"
+    systemProperty "property01", "System.Properties/PROPERTY 01"
+    systemProperty "propertymanager.properties", "/tmp/propertymanager.properties"
     testLogging.showStandardStreams = true
 }
+
