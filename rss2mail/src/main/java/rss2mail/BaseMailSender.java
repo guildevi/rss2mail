@@ -14,51 +14,55 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import rss2mail.cloudant.BaseMailProperties;
 import rss2mail.cloudant.BaseProperties;
 import rss2mail.cloudant.BaseUser;
 import rss2mail.exceptions.RssException;
 import rss2mail.interfaces.Database;
-import rss2mail.interfaces.MailProperties;
+import rss2mail.interfaces.ServerProperties;
 import rss2mail.interfaces.RssItem;
 import rss2mail.interfaces.Sender;
 import rss2mail.interfaces.SenderProperties;
 import rss2mail.interfaces.UserGroup;
 import rss2mail.interfaces.UserGroups;
+import system.utilities.PropertyManager;
 
 public class BaseMailSender implements Sender
 {	
 	public static Logger logger = 
 			java.util.logging.Logger.getLogger(BaseMailSender.class.getCanonicalName());
 
-	private final static String ARG_DATABASE_CLASS = "rss2mail.mailsender.database.class";
-	private final static String ARG_DATABASE_ID = "rss2mail.mailsender.database.id";
-	private final static String ARG_PROPERTIES_CLASS = "rss2mail.sender.properties.class";
-	private final static String ARG_PROPERTIES_ID = "rss2mail.sender.properties.id";
-	private final static String ARG_MAILPROPS_CLASS = "rss2mail.sender.mail.properties.class";
-	private final static String ARG_MAILPROPS_ID = "rss2mail.sender.mail.properties.id";
+	private final static String SYSPROP_PROPERTIES = System.getProperty("rss2mail.mailsender.properties",RssToMail.SYSPROP_PROPERTIES);
+	private final static String SYSPROP_DATABASE_CLASS = "rss2mail.mailsender.database.class";
+	private final static String SYSPROP_DATABASE_NAME = "rss2mail.mailsender.database.name";
+	private final static String SYSPROP_DOCUMENT_ID = "rss2mail.mailsender.document.id";
+	private final static String SYSPROP_PROPERTIES_CLASS = "rss2mail.sender.properties.class";
 	
-	private static String DATABASE_CLASS = System.getProperty(ARG_DATABASE_CLASS,rss2mail.cloudant.Database.class.getCanonicalName());
-	private static String DATABASE_ID = System.getProperty(ARG_DATABASE_ID);
-	private static String PROPERTIES_CLASS = System.getProperty(ARG_PROPERTIES_CLASS,BaseProperties.class.getCanonicalName());
-	private static String PROPERTIES_ID = System.getProperty(ARG_PROPERTIES_ID,RssToMail.PROPERTIES_ID);
-	private static String MAILPROPS_CLASS = System.getProperty(ARG_MAILPROPS_CLASS,BaseMailProperties.class.getCanonicalName());
-	private static String MAILPROPS_ID = System.getProperty(ARG_MAILPROPS_ID,RssToMail.PROPERTIES_ID);
-
-	//private SenderProperties properties;
-	
+	private String databaseClass;
+	private String databaseName;
+	private String documentId;
+	private String propertiesClass;
+		
 	private Database database;
 	private SenderProperties properties;	
-	private MailProperties mailProperties;	
+	private ServerProperties serverProperties;	
 	private UserGroups userGroups;
 	
 	public BaseMailSender() throws Exception {
 		
 		super();
+		databaseClass = 
+				PropertyManager.getProperty(SYSPROP_PROPERTIES,SYSPROP_DATABASE_CLASS,RssToMail.DATABASE_CLASS);
+		databaseName = 
+				PropertyManager.getProperty(SYSPROP_PROPERTIES,SYSPROP_DATABASE_NAME,RssToMail.DATABASE_NAME);
+		propertiesClass = 
+				PropertyManager.getProperty(SYSPROP_PROPERTIES,SYSPROP_PROPERTIES_CLASS,BaseProperties.class.getCanonicalName());
+		documentId = 
+				PropertyManager.getProperty(SYSPROP_PROPERTIES,SYSPROP_DOCUMENT_ID,RssToMail.DOCUMENT_ID);
+
 		initDatabase();
 		initProperties();
 		initUserGroups();
-		initMailProperties();
+		initServerProperties();
 	}
 			
 	public void send(List<RssItem> rssItems) throws Exception {
@@ -82,7 +86,7 @@ public class BaseMailSender implements Sender
 		Session session = null;
 		
 		try {
-			session = Session.getInstance(getMailProperties().toProperties());
+			session = Session.getInstance(getServerProperties().toProperties());
 		} catch(Exception e) {
 			logger.severe(e.toString());
 			throw e;
@@ -90,7 +94,7 @@ public class BaseMailSender implements Sender
 		
 		try {
 			Transport transport = session.getTransport("smtp");
-			transport.connect(getMailProperties().getUser(), getMailProperties().getPassword());
+			transport.connect(getServerProperties().getUser(), getServerProperties().getPassword());
 		} catch(Exception e) {
 			logger.severe(e.toString());
 			throw e;
@@ -115,7 +119,7 @@ public class BaseMailSender implements Sender
 			{
 				MimeMessage message = getMessage(session,userGroup,item);		
 				logger.info("Send to "+userGroup.getName());
-				Transport.send(message, mailProperties.getUser(), mailProperties.getPassword());
+				Transport.send(message, serverProperties.getUser(), serverProperties.getPassword());
 			}
 		} catch(RssException e) {
 			logger.warning(e.getLocalizedMessage());
@@ -146,9 +150,9 @@ public class BaseMailSender implements Sender
 			msg.addHeader("format", "flowed");
 			msg.addHeader("Content-Transfer-Encoding", "8bit");
 
-			msg.setFrom(getMailProperties().getUser());
+			msg.setFrom(getServerProperties().getUser());
 			InternetAddress[] replyTo=new InternetAddress[1];
-			replyTo[0] = new InternetAddress(getMailProperties().getReplyTo());
+			replyTo[0] = new InternetAddress(getServerProperties().getReplyTo());
 			msg.setReplyTo(replyTo);
 			msg.setSubject(getSubject(userGroup, item), "UTF-8");
 			
@@ -211,11 +215,9 @@ public class BaseMailSender implements Sender
 	
 	private void initDatabase() throws Exception {
 		try {
-    		String classname = DATABASE_CLASS;
-    		String _id = DATABASE_ID;
-    		Class<?> clazz = Class.forName(classname);
-    		if(_id != null) {
-    			setDatabase((Database)clazz.getConstructor(String.class).newInstance(_id));
+    		Class<?> clazz = Class.forName(databaseClass);
+    		if(databaseName != null) {
+    			setDatabase((Database)clazz.getConstructor(String.class).newInstance(databaseName));
     		} else {
     			setDatabase((Database)clazz.getConstructor().newInstance());
     		}
@@ -235,10 +237,7 @@ public class BaseMailSender implements Sender
 	
 	public void initProperties() throws Exception {
 		try {
-    		String classname = PROPERTIES_CLASS;
-    		String _id = PROPERTIES_ID;
-    		if(_id == null) _id = classname.substring(classname.lastIndexOf('.'+1));
-    		setProperties((SenderProperties)getDatabase().find(classname, _id));
+    		setProperties((SenderProperties)getDatabase().find(propertiesClass,documentId));
        	} catch(Exception e) {
     		logger.severe(e.toString());
     		throw e;
@@ -256,8 +255,9 @@ public class BaseMailSender implements Sender
 	public void initUserGroups() throws Exception {
 		try {
     		String classname = getProperties().getUserGroupsClass();
-    		String _id = getProperties().getUserGroupsId();
-    		if(_id == null) _id = classname.substring(classname.lastIndexOf('.')+1);
+    		String _id = getProperties().getUserGroupsDocId();
+    		if(_id == null) _id = classname;
+    		if(!getDatabase().contains(_id)) _id=documentId; 
     		setUserGroups((UserGroups)getDatabase().find(classname, _id));
        	} catch(Exception e) {
     		logger.severe(e.toString());
@@ -265,20 +265,23 @@ public class BaseMailSender implements Sender
     	}
     }
 	
-	public MailProperties getMailProperties() {
-		return mailProperties;
+	public ServerProperties getServerProperties() {
+		return serverProperties;
     }
 	
-	public void setMailProperties(MailProperties mailProperties) {
-		this.mailProperties = mailProperties;
+	public void setServerProperties(ServerProperties mailProperties) {
+		this.serverProperties = mailProperties;
     }
 	
-	public void initMailProperties() throws Exception {
+	public void initServerProperties() throws Exception {
 		try {
-    		String classname = MAILPROPS_CLASS;
-    		String _id = MAILPROPS_ID;
-    		if(_id == null) _id = classname.substring(classname.lastIndexOf('.')+1);
-    		setMailProperties((MailProperties)getDatabase().find(classname, _id));
+			String classname = getProperties().getServerClass();
+    		String _id = getProperties().getServerDocId();
+  
+    		if(_id == null) _id = classname;
+    		if(!getDatabase().contains(_id)) _id=documentId; 
+    		
+    		setServerProperties((ServerProperties)getDatabase().find(classname, _id));
        	} catch(Exception e) {
     		logger.severe(e.toString());
     		throw e;

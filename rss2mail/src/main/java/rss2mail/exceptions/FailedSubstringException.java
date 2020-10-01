@@ -1,6 +1,8 @@
 package rss2mail.exceptions;
 
 public class FailedSubstringException extends RssException {
+	
+	public static final long serialVersionUID = 0;
 
 	public FailedSubstringException() {
 	}

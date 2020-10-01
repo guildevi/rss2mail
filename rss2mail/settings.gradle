@@ -1,0 +1,5 @@
+include ':cloudant.utilities'
+project(':cloudant.utilities').projectDir = new File(settingsDir, '../cloudant.utilities')
+
+include ':system.utilities'
+project(':system.utilities').projectDir = new File(settingsDir, '../system.utilities')

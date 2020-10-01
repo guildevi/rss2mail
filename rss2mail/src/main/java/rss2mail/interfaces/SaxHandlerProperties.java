@@ -7,7 +7,7 @@ public interface SaxHandlerProperties  {
 	public String getItemClass();
 	public String getPubDateFormat();
 	public String getStatusClass();
-	public String getStatusId();
+	public String getStatusDocId();
 	public JsonObject toJson();
 	public String toString();
 }

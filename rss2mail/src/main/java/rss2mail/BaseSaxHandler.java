@@ -22,22 +22,24 @@ import rss2mail.interfaces.RssItem;
 import rss2mail.interfaces.RssStatus;
 import rss2mail.interfaces.SaxHandler;
 import rss2mail.interfaces.SaxHandlerProperties;
+import system.utilities.PropertyManager;
 
 public class BaseSaxHandler extends DefaultHandler implements SaxHandler 
 {	
 	public static Logger logger = 
 			Logger.getLogger(BaseSaxHandler.class.getCanonicalName());
 
-	private final static String ARG_DATABASE_CLASS = "rss2mail.saxhandler.database.class";
-	private final static String ARG_DATABASE_ID = "rss2mail.saxhandler.database.id";
-	private final static String ARG_PROPERTIES_CLASS = "rss2mail.saxhandler.properties.class";
-	private final static String ARG_PROPERTIES_ID = "rss2mail.saxhandler.properties.id";
+	private final static String SYSPROP_PROPERTIES = System.getProperty("rss2mail.saxhandler.properties",RssToMail.SYSPROP_PROPERTIES);
+	private final static String SYSPROP_DATABASE_CLASS = "rss2mail.saxhandler.database.class";
+	private final static String SYSPROP_DATABASE_NAME = "rss2mail.saxhandler.database.name";
+	private final static String SYSPROP_DOCUMENT_ID = "rss2mail.saxhandler.document.id";
+	private final static String SYSPROP_PROPERTIES_CLASS = "rss2mail.saxhandler.properties.class";
 	
-	private static String DATABASE_CLASS = System.getProperty(ARG_DATABASE_CLASS,rss2mail.cloudant.Database.class.getCanonicalName());
-	private static String DATABASE_ID = System.getProperty(ARG_DATABASE_ID);
-	private static String PROPERTIES_CLASS = System.getProperty(ARG_PROPERTIES_CLASS,BaseProperties.class.getCanonicalName());
-	private static String PROPERTIES_ID = System.getProperty(ARG_PROPERTIES_ID,RssToMail.PROPERTIES_ID);
-	
+	private static String databaseClass;
+	private static String databaseName;
+	private static String documentId;
+	private static String propertiesClass;
+		
 	private Database database;
 	private SaxHandlerProperties properties;
     private RssStatus rssStatus;
@@ -75,6 +77,15 @@ public class BaseSaxHandler extends DefaultHandler implements SaxHandler
 
 	public BaseSaxHandler() throws Exception {
 		super();
+		databaseClass = 
+				PropertyManager.getProperty(SYSPROP_PROPERTIES,SYSPROP_DATABASE_CLASS,RssToMail.DATABASE_CLASS);
+		databaseName = 
+				PropertyManager.getProperty(SYSPROP_PROPERTIES,SYSPROP_DATABASE_NAME,RssToMail.DATABASE_NAME);
+		documentId = 
+				PropertyManager.getProperty(SYSPROP_PROPERTIES,SYSPROP_DOCUMENT_ID,RssToMail.DOCUMENT_ID);
+		propertiesClass = 
+				PropertyManager.getProperty(SYSPROP_PROPERTIES,SYSPROP_PROPERTIES_CLASS,BaseProperties.class.getCanonicalName());
+			
 		initDatabase();
 		initProperties();
 		logger.info(getProperties().toString());
@@ -338,13 +349,11 @@ public class BaseSaxHandler extends DefaultHandler implements SaxHandler
 	
 	private void initDatabase() throws Exception {
 		try {
-    		String classname = DATABASE_CLASS;
-    		String _id = DATABASE_ID;
-    		Class<?> clazz = Class.forName(classname);
-    		if(_id == null) {
+    		Class<?> clazz = Class.forName(databaseClass);
+    		if(databaseName == null) {
     			setDatabase((Database)clazz.getConstructor().newInstance());
     		} else {
-    			setDatabase((Database)clazz.getConstructor(String.class).newInstance(_id));
+    			setDatabase((Database)clazz.getConstructor(String.class).newInstance(databaseName));
     		}
        	} catch(Exception e) {
     		logger.severe(e.toString());
@@ -358,10 +367,7 @@ public class BaseSaxHandler extends DefaultHandler implements SaxHandler
 	
 	public void initProperties() throws Exception {
 		try {
-    		String classname = PROPERTIES_CLASS;
-    		String _id = PROPERTIES_ID;
-    		if(_id == null) _id = classname.substring(classname.lastIndexOf('.')+1);
-    		setProperties((SaxHandlerProperties)getDatabase().find(classname, _id));
+    		setProperties((SaxHandlerProperties)getDatabase().find(propertiesClass, documentId));
        	} catch(Exception e) {
     		logger.severe(e.toString());
     		throw e;
@@ -375,8 +381,9 @@ public class BaseSaxHandler extends DefaultHandler implements SaxHandler
 	public void initRssStatus() throws Exception {
 		try {
     		String classname = getProperties().getStatusClass();
-    		String _id = getProperties().getStatusId();
-    		if(_id == null) _id = classname.substring(classname.lastIndexOf('.')+1);
+    		String _id = getProperties().getStatusDocId();
+    		if(_id == null) _id = classname;
+    		if(!getDatabase().contains(_id)) _id=documentId; 
     		setRssStatus((RssStatus)getDatabase().find(classname, _id));
     	} catch(Exception e) {
     		logger.severe(e.toString());

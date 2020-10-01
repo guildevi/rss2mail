@@ -30,8 +30,9 @@ dependencies {
 }
 
 test {
-    systemProperty "property01", "System.Properties/PROPERTY 01"
-    systemProperty "propertymanager.properties", "/tmp/propertymanager.properties"
+    systemProperty "java.property", "JAVA PROPERTY"
+    systemProperty "propertymanager.properties", "$buildDir/resources/test/JAVAPROPERTIESFILE.properties"
+    systemProperty "java.util.logging.config.file", "$buildDir/resources/test/logging.properties"
     testLogging.showStandardStreams = true
 }
 

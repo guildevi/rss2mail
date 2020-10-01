@@ -9,4 +9,5 @@ public interface Database {
 	public void save(Object object) throws Exception;
 	public void update(Object object) throws Exception;
 	public void remove(Object object) throws Exception;
+	public boolean contains(String _id) throws Exception;
 }

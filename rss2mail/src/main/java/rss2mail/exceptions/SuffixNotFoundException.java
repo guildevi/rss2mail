@@ -2,6 +2,8 @@ package rss2mail.exceptions;
 
 public class SuffixNotFoundException extends RssException {
 
+	public static final long serialVersionUID = 0;
+
 	public SuffixNotFoundException() {
 	}
 

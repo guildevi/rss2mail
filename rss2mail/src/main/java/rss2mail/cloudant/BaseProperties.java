@@ -6,7 +6,8 @@ import cloudant.utilities.CloudantObject;
 import rss2mail.interfaces.SaxHandlerProperties;
 import rss2mail.interfaces.SenderProperties;
 
-public class BaseProperties extends CloudantObject implements SaxHandlerProperties, SenderProperties {
+public class BaseProperties extends CloudantObject 
+	implements SaxHandlerProperties, SenderProperties {
 	
 	public BaseProperties(String _id) {
 		super(_id);
@@ -17,10 +18,16 @@ public class BaseProperties extends CloudantObject implements SaxHandlerProperti
 	private String senderClass = null;
 	private String handlerClass = null;
 	private String itemClass = null;
+	
 	private String statusClass = null;
-	private String statusId = null;
+	private String statusDocId = null;
+	
+	private String serverClass = null;
+	private String serverDocId = null;
+	
 	private String userGroupsClass = null;
-	private String userGroupsId = null;
+	private String userGroupsDocId = null;
+	
 	private String pubDateFormat = null;
 	//private int max = 10;
 	//private int wait = 60;	
@@ -33,10 +40,16 @@ public class BaseProperties extends CloudantObject implements SaxHandlerProperti
 		jsonObject.addProperty("senderClass", getSenderClass());
 		jsonObject.addProperty("handlerClass", getHandlerClass());
 		jsonObject.addProperty("itemClass", getItemClass());
+		
+		
+		jsonObject.addProperty("serverClass", getStatusClass());
+		jsonObject.addProperty("serverDocId", getStatusDocId());
+		
 		jsonObject.addProperty("statusClass", getStatusClass());
-		jsonObject.addProperty("groupsClass", getUserGroupsClass());
-		jsonObject.addProperty("statusId", getStatusId());
-		jsonObject.addProperty("groupsClass", getUserGroupsId());
+		jsonObject.addProperty("statusDocId", getStatusDocId());
+		
+		jsonObject.addProperty("userGroupsClass", getUserGroupsClass());
+		jsonObject.addProperty("userGroupsDocId", getUserGroupsDocId());
 		return jsonObject;
 	}
 
@@ -88,12 +101,12 @@ public class BaseProperties extends CloudantObject implements SaxHandlerProperti
 		this.statusClass = statusClass;
 	}
 	
-	public String getStatusId() {
-		return statusId;
+	public String getStatusDocId() {
+		return statusDocId;
 	}
 	
-	public void setStatusId(String statusId) {
-		this.statusId = statusId;
+	public void setStatusDocId(String statusId) {
+		this.statusDocId = statusId;
 	}
 	
 	public String getUserGroupsClass() {
@@ -104,12 +117,12 @@ public class BaseProperties extends CloudantObject implements SaxHandlerProperti
 		this.userGroupsClass = userGroupsClass;
 	}
 	
-	public String getUserGroupsId() {
-		return userGroupsId;
+	public String getUserGroupsDocId() {
+		return userGroupsDocId;
 	}
 	
-	public void setUserGroupsId(String userGroupsId) {
-		this.userGroupsId = userGroupsId;
+	public void setUserGroupsDocId(String userGroupsId) {
+		this.userGroupsDocId = userGroupsId;
 	}
 		
 	public String getTitle() {
@@ -118,5 +131,21 @@ public class BaseProperties extends CloudantObject implements SaxHandlerProperti
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public String getServerClass() {
+		return serverClass;
+	}
+
+	public void setServerClass(String serverClass) {
+		this.serverClass = serverClass;
+	}
+
+	public String getServerDocId() {
+		return serverDocId;
+	}
+
+	public void setServerDocId(String serverDocId) {
+		this.serverDocId = serverDocId;
 	}
 }

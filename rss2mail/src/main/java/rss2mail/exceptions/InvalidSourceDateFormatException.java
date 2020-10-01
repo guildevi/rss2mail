@@ -2,6 +2,8 @@ package rss2mail.exceptions;
 
 public class InvalidSourceDateFormatException extends RssException {
 
+	public static final long serialVersionUID = 0;
+
 	public InvalidSourceDateFormatException() {
 	}
 

@@ -32,6 +32,6 @@ dependencies {
 }
 
 test {
-    systemProperty "java.util.logging.config.file", "./build/resources/test/logging.properties"
+    systemProperty "java.util.logging.config.file", "$buildDir/resources/test/logging.properties"
     testLogging.showStandardStreams = true
 }

@@ -4,7 +4,7 @@ import java.util.Properties;
 
 import com.google.gson.JsonObject;
 
-public interface MailProperties {
+public interface ServerProperties {
 		public String getHost();
 		public int getPort();
 		public boolean isStarttlsEnable();

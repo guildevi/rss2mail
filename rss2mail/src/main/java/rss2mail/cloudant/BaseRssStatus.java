@@ -17,6 +17,10 @@ public class BaseRssStatus extends CloudantObject implements RssStatus {
 	private Date timestamp = null;
 	private int size = 0;
 	
+	public BaseRssStatus() {
+		super(BaseRssStatus.class.getCanonicalName());
+	}
+
 	public BaseRssStatus(String _id) {
 		super(_id);
 	}

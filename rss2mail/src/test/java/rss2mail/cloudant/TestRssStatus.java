@@ -18,7 +18,13 @@ public class TestRssStatus {
 		try {
 			CloudantDatabase database = new CloudantDatabase();
 
-			BaseRssStatus object = (BaseRssStatus)database.find(BaseRssStatus.class.getCanonicalName());
+			String _id = BaseRssStatus.class.getCanonicalName();
+			if(!database.contains(_id)) {
+				logger.info(String.format("Document %s does not exists", _id));
+				BaseRssStatus baseRssStatus = new BaseRssStatus();
+				database.save(baseRssStatus);
+			}
+			BaseRssStatus object = (BaseRssStatus)database.find(_id);
 			assertNotNull("RssStatus is null!", object);
 			logger.info(object.toString());
 			

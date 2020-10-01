@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 
 import cloudant.utilities.CloudantObject;
 
-public class BaseMailProperties extends CloudantObject implements rss2mail.interfaces.MailProperties {
+public class BaseServerProperties extends CloudantObject implements rss2mail.interfaces.ServerProperties {
 	
 	public final static String PROP_HOST="mail.smtp.host";
 	public final static String PROP_PORT="mail.smtp.port";
@@ -24,7 +24,7 @@ public class BaseMailProperties extends CloudantObject implements rss2mail.inter
 	private String password = null;
 	private String replyTo = null;
 	
-	public BaseMailProperties(String _id) {
+	public BaseServerProperties(String _id) {
 		super(_id);
 	}
 

@@ -31,11 +31,22 @@ dependencies {
     implementation 'com.cloudant:cloudant-client:2.18.0'
     implementation 'com.cloudant:cloudant-http:2.18.0'
     
-    compile project(':system.utilities')
+    implementation project(':system.utilities')
 }
 
 test {
-    //systemProperty "cloudant.properties", "/Users/gude/eclipse-workspace/RssToMail/rss2mail.properties/cloudant.properties"
-    //systemProperty "java.util.logging.config.file", "../rss2mail.properties/logging.properties"
+    systemProperty "java.util.logging.config.file", "$buildDir/resources/test/logging.properties"
+    systemProperty "cloudant.properties", pcloudantproperties
     testLogging.showStandardStreams = true
 }
+
+
+task helloWorld {
+	dependsOn 'compileTestJava'
+    doLast {
+		println "Hello World!"
+		println pcloudantproperties
+    }
+}
+
+

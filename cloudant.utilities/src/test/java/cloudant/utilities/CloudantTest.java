@@ -1,48 +1,23 @@
 package cloudant.utilities;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 public class CloudantTest {
 	
+	public static void main(String[] args) {
+		CloudantTest test = new CloudantTest();
+		test.test();
+	}
+
 	private Logger logger = Logger.getLogger(CloudantTest.class.getCanonicalName());
 	private String _id = this.getClass().getSimpleName();
 	private CloudantDatabase database = null;
 	private CloudantProperties cloudantProperties = null;
-
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-		ClassLoader cl = ClassLoader.getSystemClassLoader();
-        URL[] urls = ((URLClassLoader)cl).getURLs();
-
-        for(URL url: urls){
-        	System.out.println(url.getFile());
-        }
-	}
-
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
-
-	@Before
-	public void setUp() throws Exception {
-	}
-
-	@After
-	public void tearDown() throws Exception {
-	}
 
 	@Test
 	public void test() {
@@ -61,10 +36,11 @@ public class CloudantTest {
 		} catch(Exception e) {
 			logger.info("Object "+_id+" does not exists");
 		}
-		assertNull("cloudantProperties is not null!", cloudantProperties);
+		//assertNull("cloudantProperties is not null!", cloudantProperties);
 
 		try {
 			if(cloudantProperties!=null) {
+				logger.warning("remove "+cloudantProperties.toJson());
 				database.remove(cloudantProperties);
 				cloudantProperties = null;
 			}
@@ -78,7 +54,7 @@ public class CloudantTest {
 			Properties properties = new Properties();
 			properties.put("NAME1", "VALUE ONE");
 			cloudantProperties.setProperties(properties);
-			logger.info(cloudantProperties.toString());
+			logger.info(String.format("Save %s", cloudantProperties.toString()));
 			database.save(cloudantProperties);
 			cloudantProperties = null;
 		
@@ -86,11 +62,13 @@ public class CloudantTest {
 			assertNotNull("cloudantProperties is null!", cloudantProperties);
 			assertEquals("cloudantProperties has not only one property", 1, cloudantProperties.getProperties().size(), 0);
 			cloudantProperties.getProperties().add(new Property("NAME2", "VALUE TWO"));
-			logger.info(cloudantProperties.toString());
+			logger.info(String.format("Update %s", cloudantProperties.toString()));
 			database.update(cloudantProperties);
 			cloudantProperties = null;
 			
+			logger.info(String.format("Find %s", _id));
 			cloudantProperties = CloudantProperties.find(database,_id);
+			logger.info(String.format("Found %s", cloudantProperties.toJson()));
 			assertNotNull("cloudantProperties is null!", cloudantProperties);
 			assertEquals("cloudantProperties does not have two properties", 2, cloudantProperties.getProperties().size(), 0);
 			cloudantProperties = null;
@@ -99,10 +77,13 @@ public class CloudantTest {
 		}
 		
 		try {
+			logger.info(String.format("Remove %s", cloudantProperties.get_id()));
 			database.remove(cloudantProperties);
+			logger.finest(String.format("Find %s", _id));
 			cloudantProperties = CloudantProperties.find(database,_id);	
 			
 		} catch(Exception e) {
+			logger.finest(String.format("Exception %s", e.toString()));
 			assertNull("cloudantProperties is not null!", cloudantProperties);
 		}
 	}

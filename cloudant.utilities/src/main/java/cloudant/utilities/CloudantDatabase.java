@@ -84,7 +84,7 @@ public class CloudantDatabase {
 	public Object find(Class<?> object) 
 	throws Exception
 	{
-		return find(object,object.getSimpleName());
+		return find(object,object.getCanonicalName());
 	}
 
 	public Object find(String classname, String _id) 
@@ -183,6 +183,10 @@ public class CloudantDatabase {
 
 	public void setDatabase(Database database) {
 		this.database = database;
+	}
+	
+	public boolean contains(String _id) {
+		return this.database.contains(_id);
 	}
 
 }

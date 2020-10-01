@@ -2,6 +2,8 @@ package rss2mail.exceptions;
 
 public class RssException extends Exception {
 
+	public static final long serialVersionUID = 0;
+
 	public RssException() {
 	}
 
